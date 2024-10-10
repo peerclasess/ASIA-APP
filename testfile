@@ -1,0 +1,10 @@
+if [ $? -eq 0 ]; then
+          echo "Finished copying property file to $APP_RESOURCE_PATH" && ls $APP_RESOURCE_PATH         
+          sleep 20
+          echo "Building for $BUILD_ENV"
+          sleep 10
+          cd $APP_HOME_PATH && /usr/maven/apache-maven-3.8.6/bin/mvn clean package -P $BUILD_ENV
+    else
+          echo "Command failed"
+          exit 1
+fi
