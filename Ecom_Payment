@@ -1,0 +1,133 @@
+from django.db import models
+
+class Payment(models.Model):
+    stripe_charge_id = models.CharField(max_length=50)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    successful = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Payment: {self.stripe_charge_id}"
+
+from django.conf import settings
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+from .models import Order, Payment
+import stripe
+
+# Set Stripe API key
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+def initiate_payment(request, order_id):
+    """
+    Renders the payment page for a specific order.
+    """
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'payment.html', {
+        'order_id': order.id,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY
+    })
+
+@csrf_exempt
+def process_payment(request):
+    """
+    Processes the payment through Stripe.
+    """
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        token = request.POST.get('stripeToken')
+        order = get_object_or_404(Order, id=order_id)
+
+        try:
+            # Create a charge in Stripe
+            charge = stripe.Charge.create(
+                amount=int(order.product.price * 100),  # Price in cents
+                currency='usd',
+                description=f"Payment for order {order.id}",
+                source=token
+            )
+
+            # If the charge is successful, create a Payment object
+            payment = Payment.objects.create(
+                stripe_charge_id=charge['id'],
+                amount=order.product.price,
+                successful=True
+            )
+
+            # Associate the payment with the order
+            order.payment = payment
+            order.save()
+
+            # Redirect to success page
+            return redirect('payment_success')
+
+        except stripe.error.CardError as e:
+            # Handle any card errors
+            return render(request, 'payment_failed.html', {'error': str(e)})
+    
+    return redirect('home')
+
+def payment_success(request):
+    """
+    Displays the payment success page.
+    """
+    return render(request, 'payment_success.html')
+
+def payment_failed(request):
+    """
+    Displays the payment failed page.
+    """
+    return render(request, 'payment_failed.html')
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <h1>Complete Your Payment</h1>
+    <form action="{% url 'process_payment' %}" method="post" id="payment-form">
+        {% csrf_token %}
+        <input type="hidden" name="order_id" value="{{ order_id }}">
+        <div id="card-element"></div>
+        <button type="submit">Pay</button>
+    </form>
+
+    <script>
+        var stripe = Stripe('{{ stripe_public_key }}');
+        var elements = stripe.elements();
+        var card = elements.create('card');
+        card.mount('#card-element');
+        
+        var form = document.getElementById('payment-form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            stripe.createToken(card).then(function(result) {
+                if (result.error) {
+                    // Display error message
+                } else {
+                    var hiddenInput = document.createElement('input');
+                    hiddenInput.setAttribute('type', 'hidden');
+                    hiddenInput.setAttribute('name', 'stripeToken');
+                    hiddenInput.setAttribute('value', result.token.id);
+                    form.appendChild(hiddenInput);
+                    form.submit();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('initiate-payment/<int:order_id>/', views.initiate_payment, name='initiate_payment'),
+    path('process-payment/', views.process_payment, name='process_payment'),
+    path('payment-success/', views.payment_success, name='payment_success'),
+    path('payment-failed/', views.payment_failed, name='payment_failed'),
+]
+
+#to start 
+python manage.py runserver
