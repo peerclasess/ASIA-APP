@@ -1,5 +1,5 @@
 from django.db import models
-
+##This file is used to create product models for new items
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
