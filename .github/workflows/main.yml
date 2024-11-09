@@ -1,5 +1,5 @@
 # .github/workflows/manual-job.yaml
-name: Manual Command Runner
+name: Automate workflow trigger
 
 on:
   push:
