@@ -1,0 +1,17 @@
+# .github/workflows/manual-job.yaml
+name: Manual Command Runner
+
+on:
+  workflow_dispatch:  # Allows for manual trigger
+
+jobs:
+  run-commands:
+    name: Run Linux Commands
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run specified commands
+        run: |
+          echo "Running provided commands:"
+          echo "${{ github.event.inputs.commands }}"
+          eval "${{ github.event.inputs.commands }}"
