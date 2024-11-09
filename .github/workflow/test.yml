@@ -2,7 +2,9 @@
 name: Manual Command Runner
 
 on:
-  workflow_dispatch:  # Allows for manual trigger
+  push:
+    branches:
+      - main
 
 jobs:
   run-commands:
