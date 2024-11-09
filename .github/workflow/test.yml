@@ -13,5 +13,6 @@ jobs:
       - name: Run specified commands
         run: |
           echo "Running provided commands:"
-          echo "${{ github.event.inputs.commands }}"
-          eval "${{ github.event.inputs.commands }}"
+          ls -lart
+          pwd
+          mkdir test
