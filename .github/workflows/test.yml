@@ -14,4 +14,4 @@ jobs:
         run: |
           ls -lart
           pwd
-          cd .. &&  ls -lart
+          cd .. &&  ls -lrt
