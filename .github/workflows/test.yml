@@ -14,4 +14,4 @@ jobs:
         run: |
           ls -lart
           pwd
-          cd ASIA-APP && docker build -t localbuild:apache .
+          cd .. &&  ls -lart
