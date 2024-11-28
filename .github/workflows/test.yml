@@ -14,4 +14,4 @@ jobs:
         run: |
           ls -lart
           pwd
-          cd ../.. && docker build -t localbuild:apache
+          cd ../.. && docker build -t localbuild:apache .
