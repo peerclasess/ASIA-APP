@@ -1,9 +1,6 @@
 # Use CentOS as the base image
 FROM centos:latest
 
-# Install Apache HTTP Server
-RUN yum -y install httpd && 
-
 # Copy custom configuration files or web content (optional)
 # Replace default index.html with your content
 COPY public-html /var/www/html/
