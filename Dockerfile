@@ -2,13 +2,11 @@
 FROM centos:latest
 
 # Install Apache HTTP Server
-RUN yum -y update && \
-    yum -y install httpd && \
-    yum clean all
+RUN yum -y install httpd && 
 
 # Copy custom configuration files or web content (optional)
 # Replace default index.html with your content
-COPY ./public-html/ /var/www/html/
+COPY public-html /var/www/html/
 
 # Expose port 80
 EXPOSE 80
