@@ -17,6 +17,4 @@ jobs:
       - name: Run specified commands
         run: |
           ls -lart
-          pwd
-          cd .. &&  ls -lrt && pwd
-          cd .. && ls
+          docker build -t myimage:apache-trial .
