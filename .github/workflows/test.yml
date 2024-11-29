@@ -28,5 +28,5 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-           docker build -t $IMAGE_REPOSITORY:feature-${{ github.run_number }}
+           docker build -t $IMAGE_REPOSITORY:feature-${{ github.run_number }} .
            docker push $IMAGE_REPOSITORY:feature-${{ github.run_number }}
