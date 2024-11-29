@@ -29,5 +29,6 @@ jobs:
         run: |
           ls -lart
           sudo docker build -t $IMAGE_REPOSITORY:feature-${{ github.run_number }} .
+          sudo docker push $IMAGE_REPOSITORY:feature-${{ github.run_number }}
           sudo docker ps
           sudo docker images
